@@ -36,6 +36,7 @@ class Foodstuff(models.Model):
         ordering = ['name']
         verbose_name_plural = 'Foodstuffs'
 
+
 class Tag(models.Model):
     """
     A tag which can be linked to a Person
@@ -45,6 +46,7 @@ class Tag(models.Model):
     class Meta:
         ordering = ['label']
         verbose_name_plural = 'Tags'
+
 
 class Person(models.Model):
     """
