@@ -7,10 +7,10 @@ class Company(models.Model):
     """
 
     # The index of the company record in the JSON source data
-    index = models.PositiveIntegerField()
+    index = models.PositiveIntegerField(unique=True)
 
     # Referred to as 'company' in the JSON source data
-    company_name = models.CharField(max_length=100)
+    company_name = models.CharField(unique=True, max_length=100)
 
     class Meta:
         ordering = ['company_name']
