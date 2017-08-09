@@ -104,7 +104,8 @@ class Person(models.Model):
 
     gender = models.CharField(max_length=1, choices = GENDER_CHOICES)
 
-    company = models.ForeignKey(Company)
+    # TODO: Confirm exact behaviour of null & blank on a relationship
+    company = models.ForeignKey(Company, null=True, blank=True)
 
     email = models.EmailField(unique=True)
 
@@ -116,9 +117,9 @@ class Person(models.Model):
 
     registered = models.DateTimeField()
 
-    tags = models.ManyToManyField(Tag)
+    tags = models.ManyToManyField(Tag, blank=True)
 
-    friends = models.ManyToManyField('Person')
+    friends = models.ManyToManyField('Person', blank=True)
 
     greeting = models.CharField(max_length=100)
 

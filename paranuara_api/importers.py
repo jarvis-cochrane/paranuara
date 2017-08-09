@@ -4,6 +4,8 @@ import logging
 import re
 import sys
 
+from django.core.exceptions import ObjectDoesNotExist
+
 from paranuara_api.models import Company, Tag, Foodstuff, Person
 
 logger = logging.getLogger(__name__)
@@ -112,7 +114,10 @@ def _import_person(data):
 
         # Look up the associated company
 
-        company = Company.objects.get_for_index(data['company_id'])
+        try:
+            company = Company.objects.get_for_index(data['company_id'])
+        except ObjectDoesNotExist:
+            company = None
 
         person =  Person.objects.create(
                     json_id=data['_id'],
