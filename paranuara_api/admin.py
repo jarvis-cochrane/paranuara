@@ -1,3 +1,8 @@
 from django.contrib import admin
 
-# Register your models here.
+from paranuara_api.models import Company
+
+
+@admin.register(Company)
+class CompanyAdmin(admin.ModelAdmin):
+    list_display = ('index', 'company_name')
