@@ -1,6 +1,11 @@
 from django.db import models
 
 
+class CompanyManager(models.Manager):
+
+    def get_for_index(self, index):
+        return self.get(index=index)
+
 class Company(models.Model):
     """
     A Paranuaran company.
@@ -11,6 +16,11 @@ class Company(models.Model):
 
     # Referred to as 'company' in the JSON source data
     company_name = models.CharField(unique=True, max_length=100)
+
+    objects = CompanyManager()
+
+    def __str__(self):
+        return self.company_name
 
     class Meta:
         ordering = ['company_name']
@@ -32,6 +42,9 @@ class Foodstuff(models.Model):
     name = models.CharField(unique=True, max_length=100)
     type = models.CharField(max_length=1, choices=TYPE_CHOICES)
 
+    def __str__(self):
+        return self.name
+
     class Meta:
         ordering = ['name']
         verbose_name_plural = 'Foodstuffs'
@@ -42,6 +55,9 @@ class Tag(models.Model):
     A tag which can be linked to a Person
     """
     label = models.CharField(unique=True, max_length=100)
+
+    def __str__(self):
+        return self.label
 
     class Meta:
         ordering = ['label']
@@ -107,6 +123,9 @@ class Person(models.Model):
     greeting = models.CharField(max_length=100)
 
     favourite_food = models.ManyToManyField(Foodstuff)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         ordering = ['name']

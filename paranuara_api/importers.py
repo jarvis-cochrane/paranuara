@@ -1,8 +1,10 @@
+from datetime import datetime
 import json
 import logging
+import re
 import sys
 
-from paranuara_api.models import Company, Tag, Foodstuff
+from paranuara_api.models import Company, Tag, Foodstuff, Person
 
 logger = logging.getLogger(__name__)
 
@@ -16,6 +18,30 @@ logger = logging.getLogger(__name__)
 def _log_exception(msg, e):
         e_type, e_value, _ = sys.exc_info()
         logger.error('%s (%s: %s)', msg, e_type, e_value)
+
+# Compiled Regex that will match only digits and the decimal point
+_non_decimal = re.compile(r'[^\d.]+')
+
+def _parse_currency(currency):
+    """
+    Convert strings containing currency symbols and commas to 
+    plain decimal strings
+    """
+    return _non_decimal.sub('', currency)
+
+def _parse_timestamp(ts):
+    """
+    Convert the provided timestamp format to a Python datetime+TZ
+    """
+    # remove the unhelpful colon in the TZ specification
+    ts = ts[0:-3]+ts[-2:]
+    return datetime.strptime(ts, '%Y-%m-%dT%H:%M:%S %z')
+
+def _parse_choices(choices, value):
+    for (k, v) in choices:
+        if (v.lower()==value.lower()):
+            return k
+    raise ValidationError('Invalid choice {}'.format(value))
 
 
 def _import_company(data):
@@ -74,3 +100,67 @@ def _import_foodstuff(name):
     except Exception as e:
         _log_exception('Error importing foodstuff', e)
     return None
+
+def _import_person(data):
+    """
+    Create and save a new Person instance initialised with the data
+    in the supplied dictionary `data`.
+    """
+    logger.debug('_import_person(): %s', data['name'])
+
+    try:
+
+        # Look up the associated company
+
+        company = Company.objects.get_for_index(data['company_id'])
+
+        person =  Person.objects.create(
+                    json_id=data['_id'],
+                    index=data['index'],
+                    guid=data['guid'],
+                    has_died=data['has_died'],
+                    balance=_parse_currency(data['balance']),
+                    picture=data['picture'],
+                    age=data['age'],
+                    eyecolor=_parse_choices(Person.EYE_COLOR_CHOICES,
+                                            data['eyeColor']),
+                    name=data['name'],
+                    gender=_parse_choices(Person.GENDER_CHOICES, 
+                                          data['gender']),
+                    email=data['email'],
+                    phone=data['phone'],
+                    address=data['address'],
+                    about=data['about'],
+                    registered=_parse_timestamp(data['registered']),
+                    greeting = data['greeting'],
+                    company=company)
+    except Exception as e:
+        _log_exception('Error importing person', e)
+    return None
+
+def _relate_person(data):
+    """
+    Set up the relationships that require either the Person instance to have
+    a valid id, or for all People to have been imported
+    """
+    logger.debug('_relate_person(): %s', data['name'])
+
+    try:
+        person = Person.objects.get(json_id=data['_id'])
+        person.tags = [_import_tag(x) for x in data['tags']]
+        person.favourite_food = (
+            [_import_foodstuff(x) for x in data['favouriteFood']])
+        person.save()
+        return person
+    except Exception as e:
+        _log_exception('Error relating person', e)
+    return None
+
+
+def import_people(fp):
+    logger.info('Importing people')
+
+    parsed_json = json.load(fp)
+
+    [_import_person(x) for x in parsed_json]
+    return [_relate_person(x) for x in parsed_json]
