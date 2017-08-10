@@ -143,6 +143,7 @@ def _import_person(data):
         _log_exception('Error importing person', e)
     return None
 
+
 def _relate_person(data):
     """
     Set up the relationships that require either the Person instance to have
@@ -155,6 +156,10 @@ def _relate_person(data):
         person.tags = [_import_tag(x) for x in data['tags']]
         person.favourite_food = (
             [_import_foodstuff(x) for x in data['favouriteFood']])
+        person.friends = (
+            [Person.objects.get_for_index(x['index']) for x in data['friends']]
+        )
+
         person.save()
         return person
     except Exception as e:

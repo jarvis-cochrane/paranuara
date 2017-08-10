@@ -64,6 +64,12 @@ class Tag(models.Model):
         verbose_name_plural = 'Tags'
 
 
+class PersonManager(models.Manager):
+
+    def get_for_index(self, index):
+        return self.get(index=index)
+
+
 class Person(models.Model):
     """
     A Paranuaran Person
@@ -124,6 +130,8 @@ class Person(models.Model):
     greeting = models.CharField(max_length=100)
 
     favourite_food = models.ManyToManyField(Foodstuff)
+
+    objects = PersonManager()
 
     def __str__(self):
         return self.name
