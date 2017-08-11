@@ -1,4 +1,13 @@
-# Installation
+# Paranuara
+
+# Introduction
+
+This project is a possible solution to the Paranuara coding challenge at
+https://github.com/joaosgreccia/hivery-backend-challenge.
+
+This solution is optimised for development time and has some rough edges!
+
+## Installation
 
 1. Create a virtualenv environment with Python 3.6
 
@@ -20,7 +29,7 @@
 
     `python manage.py createsuperuser`
 
-# Test Cases
+## Run test cases
 
 1. Enable the virtual environment (if required)
 
@@ -30,7 +39,7 @@
 
     `python manage.py test`
 
-# Import test data
+## Import sample data
 
 1. Enable the virtual environment (if required)
 
@@ -48,7 +57,7 @@
 
     `python manage.py import_people resources/people.json`
 
-# Run web server and access REST end points
+## Run web server and access REST end points
 
 1. Enable the virtual environment (if required)
 
@@ -58,8 +67,8 @@
 
     `python manage.py runserver`
 
-Access admin pages by navigating to [http://localhost:8000/admin]
+Access admin pages by navigating to http://localhost:8000/admin
 
-Access the REST API by navigating to [http://localhost:8000/api]
+Access the REST API by navigating to http://localhost:8000/api
 
     
