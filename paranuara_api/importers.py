@@ -4,7 +4,7 @@ import logging
 import re
 import sys
 
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 
 from paranuara_api.models import Company, Tag, Foodstuff, Person
 
@@ -85,8 +85,14 @@ def _import_tag(label):
         _log_exception('Error importing tag', e)
     return None
 
+# TODO: Find a more elegant way to handle the two use cases for importing
+#       or finding a Foodstuff:
+#         * Return an existing Foodstuff by name, creating it if necessary,
+#           as part of '_relate_person()'
+#         * Create a new Foodstuff instance/record when importing the cleaned
+#           Foodstuff data from the resource file.
 
-def _import_foodstuff(name):
+def _import_foodstuff(name, type=Foodstuff.VEGETABLE):
     """
     Return a Foodstuff instance for the supplied `name` value, creating it
     if it doesn't exist. Newly created Foodstuff instances will be assigned
@@ -96,12 +102,27 @@ def _import_foodstuff(name):
     try:
         (foodstuff, _) = Foodstuff.objects.get_or_create(
                             name=name, 
-                            defaults={'name': name, 
-                                      'type': Foodstuff.VEGETABLE})
+                            defaults={'name': name,
+                                      'type': type,
+                                     })
         return foodstuff
     except Exception as e:
         _log_exception('Error importing foodstuff', e)
     return None
+
+def _import_foodstuff_from_json(parsed_json):
+    try:
+        return _import_foodstuff(name=parsed_json['name'],
+                                 type=parsed_json['type'])
+    except Exception as e:
+        _log_exception('Error importing foodstuff', e)
+    return None
+
+def import_foodstuffs(fp):
+    logger.info('Importing foodstuffs')
+
+    return json.load(fp, object_hook=_import_foodstuff_from_json)
+
 
 def _import_person(data):
     """
@@ -143,7 +164,6 @@ def _import_person(data):
         _log_exception('Error importing person', e)
     return None
 
-
 def _relate_person(data):
     """
     Set up the relationships that require either the Person instance to have
@@ -155,7 +175,8 @@ def _relate_person(data):
         person = Person.objects.get(json_id=data['_id'])
         person.tags = [_import_tag(x) for x in data['tags']]
         person.favourite_food = (
-            [_import_foodstuff(x) for x in data['favouriteFood']])
+            [_import_foodstuff(x) for x in data['favouriteFood']]
+        )
         person.friends = (
             [Person.objects.get_for_index(x['index']) for x in data['friends']]
         )
@@ -169,6 +190,22 @@ def _relate_person(data):
 
 def import_people(fp):
     logger.info('Importing people')
+
+
+    # Setting up the `Person.tags', `Person.favourite_food`, and
+    # `Person.friends` relationships requires the Person instance to have a
+    # valid `id` value. In addition, the 'friends' data might contain forward
+    # references to Person instances which occur later in the instances which
+    # occur later in the source JSON file.
+    # 
+    # So, we parse the JSON data into a list of dictionaries, then create and
+    # save the Person instances. After all the Person instances are created
+    # (excepting errors), we perform a second pass to establish the
+    # tag, favourite_food, and friend relationships.
+    #
+    # There are certainly more efficient ways of doing this, but assuming the
+    # import is a once-off process that isn't time-bounded, this is good
+    # enough!
 
     parsed_json = json.load(fp)
 
