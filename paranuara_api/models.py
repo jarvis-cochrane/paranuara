@@ -32,6 +32,15 @@ class Company(models.Model):
         verbose_name_plural = 'Companies'
 
 
+class FoodstuffQuerySet(models.QuerySet):
+
+    def fruit(self):
+        return self.filter(type=Foodstuff.FRUIT)
+
+    def vegetables(self):
+        return self.filter(type=Foodstuff.VEGETABLE)
+
+
 class Foodstuff(models.Model):
     """
     A kind of food - initially either a fruit or a vegetable
@@ -46,6 +55,8 @@ class Foodstuff(models.Model):
 
     name = models.CharField(unique=True, max_length=100)
     type = models.CharField(max_length=1, choices=TYPE_CHOICES)
+
+    objects = FoodstuffQuerySet.as_manager()
 
     def __str__(self):
         return self.name
@@ -143,6 +154,14 @@ class Person(models.Model):
     favourite_food = models.ManyToManyField(Foodstuff)
 
     objects = PersonManager.from_queryset(PersonQuerySet)()
+
+    @property
+    def favourite_fruit(self):
+        return self.favourite_food.fruit()
+
+    @property
+    def favourite_vegetables(self):
+        return self.favourite_food.vegetables()
 
     def __str__(self):
         return self.name
