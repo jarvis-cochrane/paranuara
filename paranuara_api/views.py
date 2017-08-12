@@ -6,7 +6,13 @@ from paranuara_api.serializers import (
         PersonSerializer
 )
 
-class CompanyViewSet(viewsets.ReadOnlyModelViewSet):
+class MultiSerializerMixin(object):
+
+    def get_serializer_class(self):
+        return self.serializers[self.action]
+
+
+class CompanyViewSet(MultiSerializerMixin, viewsets.ReadOnlyModelViewSet):
     queryset = Company.objects.all()
     lookup_field = 'index'
 
@@ -15,11 +21,8 @@ class CompanyViewSet(viewsets.ReadOnlyModelViewSet):
         'retrieve': CompanySerializer,
     }
 
-    def get_serializer_class(self):
-        return self.serializers[self.action]
 
-
-class PersonViewSet(viewsets.ReadOnlyModelViewSet):
+class PersonViewSet(MultiSerializerMixin, viewsets.ReadOnlyModelViewSet):
     queryset = Person.objects.all()
     lookup_field = 'index'
 
@@ -27,7 +30,4 @@ class PersonViewSet(viewsets.ReadOnlyModelViewSet):
         'list': PersonListSerializer,
         'retrieve': PersonSerializer,
     }
-
-    def get_serializer_class(self):
-        return self.serializers[self.action]
 
