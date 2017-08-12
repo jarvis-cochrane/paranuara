@@ -71,4 +71,18 @@ Access admin pages by navigating to http://localhost:8000/admin
 
 Access the REST API by navigating to http://localhost:8000/api
 
+### Rest API
+
+The REST API is not *quite* self documenting. The following urls are supported:
+
+    /companies                      list all companies
+    /companies/{company_index}      get company details & list employees
+    /people                         list all people
+    /people/{person_index}          get person details & favourite foods
+    /people/{person_index}/friends  list friends of person
+    /people/{person_index_1}/friends/{person_index_2}
+                                    list details of person 1 and person 2,
+                                    and any mutual friends who are alive and
+                                    have brown eyes.
+
     
