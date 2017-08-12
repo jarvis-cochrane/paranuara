@@ -19,6 +19,11 @@ class Company(models.Model):
 
     objects = CompanyManager()
 
+    # A current employee isn't dead yet! ;-)
+    @property
+    def current_employees(self):
+        return self.employees.is_alive()
+
     def __str__(self):
         return self.company_name
 
@@ -62,6 +67,12 @@ class Tag(models.Model):
     class Meta:
         ordering = ['label']
         verbose_name_plural = 'Tags'
+
+
+class PersonQuerySet(models.QuerySet):
+
+    def is_alive(self):
+        return self.filter(has_died=False)
 
 
 class PersonManager(models.Manager):
@@ -110,8 +121,8 @@ class Person(models.Model):
 
     gender = models.CharField(max_length=1, choices = GENDER_CHOICES)
 
-    # TODO: Confirm exact behaviour of null & blank on a relationship
-    company = models.ForeignKey(Company, null=True, blank=True)
+    company = models.ForeignKey(Company, null=True, blank=True,
+                                related_name='employees')
 
     email = models.EmailField(unique=True)
 
@@ -131,7 +142,7 @@ class Person(models.Model):
 
     favourite_food = models.ManyToManyField(Foodstuff)
 
-    objects = PersonManager()
+    objects = PersonManager.from_queryset(PersonQuerySet)()
 
     def __str__(self):
         return self.name

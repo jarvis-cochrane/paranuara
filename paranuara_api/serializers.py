@@ -1,6 +1,11 @@
 from rest_framework import serializers
 
-from paranuara_api.models import Company
+from paranuara_api.models import Company, Person
+
+class EmployeeSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Person
+        fields = ('name', 'has_died')
 
 class CompanyListSerializer(serializers.HyperlinkedModelSerializer):
     url = serializers.HyperlinkedIdentityField(view_name='company-detail',
@@ -10,6 +15,9 @@ class CompanyListSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('index', 'company_name', 'url')
 
 class CompanySerializer(serializers.ModelSerializer):
+
+    current_employees = EmployeeSerializer(many=True, read_only=True)
+
     class Meta:
         model = Company
-        fields = ('index', 'company_name')
+        fields = ('index', 'company_name', 'current_employees')
