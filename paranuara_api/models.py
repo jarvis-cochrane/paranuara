@@ -85,6 +85,12 @@ class PersonQuerySet(models.QuerySet):
     def is_alive(self):
         return self.filter(has_died=False)
 
+    def has_brown_eyes(self):
+        return self.filter(eyecolor=Person.EYE_COLOR_BROWN)
+
+    def has_friend(self, friend):
+        return self.filter(friends=friend)
+
 
 class PersonManager(models.Manager):
 

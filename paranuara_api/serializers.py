@@ -49,3 +49,21 @@ class CompanySerializer(BaseCompanySerializer):
     class Meta:
         model = Company
         fields = ('index', 'company_name', 'url', 'current_employees')
+
+
+class FriendshipPersonSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Person
+        fields = ('name', 'age', 'address', 'phone')
+
+
+class MutualFriendSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Person
+        fields = ('name', 'eyecolor', 'has_died')
+
+
+class FriendshipSerializer(serializers.Serializer):
+    person = FriendshipPersonSerializer()
+    friend = FriendshipPersonSerializer()
+    friends = MutualFriendSerializer(many=True)
