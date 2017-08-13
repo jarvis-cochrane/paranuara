@@ -13,7 +13,7 @@ This solution is optimised for development time and has some rough edges!
 
     `python -m venv env`
 
-2. Enable the virtual environment
+2. Load the virtual environment
 
     `source env/bin/activate`
 
@@ -31,7 +31,7 @@ This solution is optimised for development time and has some rough edges!
 
 ## Run test cases
 
-1. Enable the virtual environment (if required)
+1. Load the virtual environment if required
 
     `source env/bin/activate`
 
@@ -41,7 +41,7 @@ This solution is optimised for development time and has some rough edges!
 
 ## Import sample data
 
-1. Enable the virtual environment (if required)
+1. Load the virtual environment if required
 
     `source env/bin/activate`
 
@@ -59,7 +59,7 @@ This solution is optimised for development time and has some rough edges!
 
 ## Run web server and access REST end points
 
-1. Enable the virtual environment (if required)
+1. Load the virtual environment if required
 
     `source env/bin/activate`
 
@@ -83,5 +83,3 @@ The REST API is not *quite* self documenting. The following urls are supported:
     /api/people/{person_index_1}/friends/{person_index_2}   get details of person 1 and person 2,
                                                             and any mutual friends who are alive and
                                                             have brown eyes.
-
-    
