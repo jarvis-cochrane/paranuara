@@ -17,23 +17,23 @@ class Migration(migrations.Migration):
             model_name='person',
             name='company',
             field=models.ForeignKey(
-                blank=True, 
-                null=True, 
-                on_delete=django.db.models.deletion.CASCADE, 
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
                 to='paranuara_api.Company'),
         ),
         migrations.AlterField(
             model_name='person',
             name='friends',
             field=models.ManyToManyField(
-                blank=True, 
+                blank=True,
                 to='paranuara_api.Person'),
         ),
         migrations.AlterField(
             model_name='person',
             name='tags',
             field=models.ManyToManyField(
-                blank=True, 
+                blank=True,
                 to='paranuara_api.Tag'),
         ),
     ]

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from paranuara_api.models import Company, Person, Foodstuff
+from paranuara_api.models import Company, Person
 
 
 class BasePersonSerializer(serializers.HyperlinkedModelSerializer):
@@ -16,7 +16,7 @@ class PersonListSerializer(BasePersonSerializer):
 
 class PersonSerializer(BasePersonSerializer):
     username = serializers.CharField(source='name')
-    fruits = serializers.StringRelatedField(source='favourite_fruit', 
+    fruits = serializers.StringRelatedField(source='favourite_fruit',
                                             many=True)
     vegetables = serializers.StringRelatedField(source='favourite_vegetables',
                                                 many=True)

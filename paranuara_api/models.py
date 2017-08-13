@@ -6,6 +6,7 @@ class CompanyManager(models.Manager):
     def get_for_index(self, index):
         return self.get(index=index)
 
+
 class Company(models.Model):
     """
     A Paranuaran company.
@@ -88,7 +89,6 @@ class PersonQuerySet(models.QuerySet):
     def has_brown_eyes(self):
         return self.filter(eyecolor=Person.EYE_COLOR_BROWN)
 
-
     def has_friend(self, friend):
         return self.filter(friends=friend)
 
@@ -102,7 +102,7 @@ class PersonManager(models.Manager):
         return self.get(index=index)
 
     # TODO: Determine what 'friendship' actually means in this context!
-    # Is a friendship define just by the 'has friend' (forward) relationship, 
+    # Is a friendship define just by the 'has friend' (forward) relationship,
     # or also by the 'friend of' (reverse) relationship.
     #
     # Consider:
@@ -164,17 +164,17 @@ class Person(models.Model):
 
     has_died = models.BooleanField()
 
-    balance = models.DecimalField(max_digits=8,decimal_places=2)
+    balance = models.DecimalField(max_digits=8, decimal_places=2)
 
     picture = models.URLField()
 
     age = models.PositiveIntegerField()
 
-    eyecolor = models.CharField(max_length=2, choices = EYE_COLOR_CHOICES)
+    eyecolor = models.CharField(max_length=2, choices=EYE_COLOR_CHOICES)
 
     name = models.CharField(max_length=100)
 
-    gender = models.CharField(max_length=1, choices = GENDER_CHOICES)
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
 
     company = models.ForeignKey(Company, null=True, blank=True,
                                 related_name='employees')

@@ -15,8 +15,8 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='person',
             name='friends',
-            field=models.ManyToManyField(blank=True, 
-                                         related_name='friend_of', 
+            field=models.ManyToManyField(blank=True,
+                                         related_name='friend_of',
                                          to='paranuara_api.Person'),
         ),
     ]

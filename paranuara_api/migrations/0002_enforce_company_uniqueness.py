@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='company',
-            options={'ordering': ['company_name'], 
+            options={'ordering': ['company_name'],
                      'verbose_name_plural': 'Companies'},
         ),
         migrations.AlterField(

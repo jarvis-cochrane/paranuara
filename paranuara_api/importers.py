@@ -10,6 +10,7 @@ from paranuara_api.models import Company, Tag, Foodstuff, Person
 
 logger = logging.getLogger(__name__)
 
+
 # TODO: Refactor the exception handling and logging as a decorator
 #       which could be used like this:
 #
@@ -21,15 +22,18 @@ def _log_exception(msg, e):
         e_type, e_value, _ = sys.exc_info()
         logger.error('%s (%s: %s)', msg, e_type, e_value)
 
+
 # Compiled Regex that will match only digits and the decimal point
 _non_decimal = re.compile(r'[^\d.]+')
 
+
 def _parse_currency(currency):
     """
-    Convert strings containing currency symbols and commas to 
+    Convert strings containing currency symbols and commas to
     plain decimal strings
     """
     return _non_decimal.sub('', currency)
+
 
 def _parse_timestamp(ts):
     """
@@ -39,9 +43,10 @@ def _parse_timestamp(ts):
     ts = ts[0:-3]+ts[-2:]
     return datetime.strptime(ts, '%Y-%m-%dT%H:%M:%S %z')
 
+
 def _parse_choices(choices, value):
     for (k, v) in choices:
-        if (v.lower()==value.lower()):
+        if (v.lower() == value.lower()):
             return k
     raise ValidationError('Invalid choice {}'.format(value))
 
@@ -57,7 +62,7 @@ def _import_company(data):
     # TODO: More detailed validation and error reporting
     try:
         return Company.objects.create(
-                index=data['index'], 
+                index=data['index'],
                 company_name=data['company'])
     except Exception as e:
         _log_exception('Error creating company', e)
@@ -77,8 +82,8 @@ def _import_tag(label):
     """
     logger.debug('_import_tag(): %s', label)
     try:
-        (tag, _) =  Tag.objects.get_or_create(
-                        label=label, 
+        (tag, _) = Tag.objects.get_or_create(
+                        label=label,
                         defaults={'label': label})
         return tag
     except Exception as e:
@@ -92,6 +97,7 @@ def _import_tag(label):
 #         * Create a new Foodstuff instance/record when importing the cleaned
 #           Foodstuff data from the resource file.
 
+
 def _import_foodstuff(name, type=Foodstuff.VEGETABLE):
     """
     Return a Foodstuff instance for the supplied `name` value, creating it
@@ -101,14 +107,15 @@ def _import_foodstuff(name, type=Foodstuff.VEGETABLE):
     logger.debug('_import_foodstuff(): %s', name)
     try:
         (foodstuff, _) = Foodstuff.objects.get_or_create(
-                            name=name, 
+                            name=name,
                             defaults={'name': name,
                                       'type': type,
-                                     })
+                                      })
         return foodstuff
     except Exception as e:
         _log_exception('Error importing foodstuff', e)
     return None
+
 
 def _import_foodstuff_from_json(parsed_json):
     try:
@@ -117,6 +124,7 @@ def _import_foodstuff_from_json(parsed_json):
     except Exception as e:
         _log_exception('Error importing foodstuff', e)
     return None
+
 
 def import_foodstuffs(fp):
     logger.info('Importing foodstuffs')
@@ -140,29 +148,30 @@ def _import_person(data):
         except ObjectDoesNotExist:
             company = None
 
-        person =  Person.objects.create(
-                    json_id=data['_id'],
-                    index=data['index'],
-                    guid=data['guid'],
-                    has_died=data['has_died'],
-                    balance=_parse_currency(data['balance']),
-                    picture=data['picture'],
-                    age=data['age'],
-                    eyecolor=_parse_choices(Person.EYE_COLOR_CHOICES,
-                                            data['eyeColor']),
-                    name=data['name'],
-                    gender=_parse_choices(Person.GENDER_CHOICES, 
-                                          data['gender']),
-                    email=data['email'],
-                    phone=data['phone'],
-                    address=data['address'],
-                    about=data['about'],
-                    registered=_parse_timestamp(data['registered']),
-                    greeting = data['greeting'],
-                    company=company)
+        Person.objects.create(
+            json_id=data['_id'],
+            index=data['index'],
+            guid=data['guid'],
+            has_died=data['has_died'],
+            balance=_parse_currency(data['balance']),
+            picture=data['picture'],
+            age=data['age'],
+            eyecolor=_parse_choices(Person.EYE_COLOR_CHOICES,
+                                    data['eyeColor']),
+            name=data['name'],
+            gender=_parse_choices(Person.GENDER_CHOICES,
+                                  data['gender']),
+            email=data['email'],
+            phone=data['phone'],
+            address=data['address'],
+            about=data['about'],
+            registered=_parse_timestamp(data['registered']),
+            greeting=data['greeting'],
+            company=company)
     except Exception as e:
         _log_exception('Error importing person', e)
     return None
+
 
 def _relate_person(data):
     """
@@ -191,13 +200,12 @@ def _relate_person(data):
 def import_people(fp):
     logger.info('Importing people')
 
-
     # Setting up the `Person.tags', `Person.favourite_food`, and
     # `Person.friends` relationships requires the Person instance to have a
     # valid `id` value. In addition, the 'friends' data might contain forward
     # references to Person instances which occur later in the instances which
     # occur later in the source JSON file.
-    # 
+    #
     # So, we parse the JSON data into a list of dictionaries, then create and
     # save the Person instances. After all the Person instances are created
     # (excepting errors), we perform a second pass to establish the

@@ -9,6 +9,7 @@ from paranuara_api.serializers import (
         PersonSerializer, FriendshipSerializer
 )
 
+
 class MultiSerializerMixin(object):
 
     def get_serializer_class(self):
@@ -34,6 +35,7 @@ class PersonViewSet(MultiSerializerMixin, viewsets.ReadOnlyModelViewSet):
         'retrieve': PersonSerializer,
     }
 
+
 class Friendship(object):
 
     def __init__(self, person, friend, friends):
@@ -53,12 +55,12 @@ class FriendsViewSet(viewsets.ReadOnlyModelViewSet):
 
     def list(self, request, person_index=None):
         person = get_object_or_404(Person, index=person_index)
-        serializer = PersonListSerializer(person.friends.is_alive(), 
+        serializer = PersonListSerializer(person.friends.is_alive(),
                                           many=True,
                                           context={'request': request})
         return Response(serializer.data)
 
-    def retrieve(self, request, index=None, person_index=None): 
+    def retrieve(self, request, index=None, person_index=None):
         person = get_object_or_404(Person, index=person_index)
         friend = get_object_or_404(Person, index=index)
 
@@ -67,4 +69,3 @@ class FriendsViewSet(viewsets.ReadOnlyModelViewSet):
         friendship = Friendship(person, friend, friends)
         serializer = FriendshipSerializer(friendship)
         return Response(serializer.data)
-

@@ -4,6 +4,7 @@ from django.core.management.base import BaseCommand
 
 logger = logging.getLogger(__name__)
 
+
 class BaseImportCommand(BaseCommand):
 
     def _import(self, fp):

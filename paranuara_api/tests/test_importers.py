@@ -4,7 +4,7 @@ from django.test import TestCase
 from paranuara_api.importers import (
         _import_company, _import_foodstuff, _import_foodstuff_from_json,
         _import_tag, _parse_choices, _parse_currency, _parse_timestamp,
-        import_companies, 
+        import_companies,
 )
 from paranuara_api.models import Foodstuff, Tag
 
@@ -46,7 +46,7 @@ class ParseChoicesTestCase(TestCase):
 class ImportCompanyTestCase(TestCase):
 
     def test_import_company_normal(self):
-        data = { 'index': 0, 'company': 'Nostromo'}
+        data = {'index': 0, 'company': 'Nostromo'}
 
         company = _import_company(data)
 
@@ -85,7 +85,7 @@ class ImportTagTestCase(TestCase):
         self.assertEquals(tag.label, 'lame')
 
     def test_import_tag_exists(self):
-        expected_tag = Tag.objects.create(label='tame')
+        Tag.objects.create(label='tame')
         self.assertEqual(len(Tag.objects.all()), 1)
 
         tag = _import_tag('tame')
@@ -117,8 +117,8 @@ class ImportFoodstuffTestCase(TestCase):
         self.assertEquals(foodstuff.type, Foodstuff.FRUIT)
 
     def test_import_foodstuff_exists(self):
-        expected_foodstuff = Foodstuff.objects.create(
-                                name='apple', 
+        Foodstuff.objects.create(
+                                name='apple',
                                 type=Foodstuff.FRUIT)
         self.assertEqual(len(Foodstuff.objects.all()), 1)
 
@@ -128,12 +128,13 @@ class ImportFoodstuffTestCase(TestCase):
         self.assertEquals(foodstuff.name, 'apple')
         self.assertEquals(foodstuff.type, Foodstuff.FRUIT)
 
+
 class ImportFoodStuffFromJSONTestCase(TestCase):
 
     def test_import_food_stuff_from_json_new(self):
         self.assertFalse(Foodstuff.objects.exists())
 
-        json={'name': 'pear', 'type': Foodstuff.FRUIT}
+        json = {'name': 'pear', 'type': Foodstuff.FRUIT}
 
         foodstuff = _import_foodstuff_from_json(json)
 
