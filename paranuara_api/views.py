@@ -61,8 +61,9 @@ class FriendsViewSet(viewsets.ReadOnlyModelViewSet):
     def retrieve(self, request, index=None, person_index=None): 
         person = get_object_or_404(Person, index=person_index)
         friend = get_object_or_404(Person, index=index)
-        friends = (Person.objects.has_friend(person).has_friend(friend).
-                   has_brown_eyes().is_alive())
+
+        friends = Person.objects.mutual_friends_alive_with_brown_eyes(
+                        person, friend)
         friendship = Friendship(person, friend, friends)
         serializer = FriendshipSerializer(friendship)
         return Response(serializer.data)

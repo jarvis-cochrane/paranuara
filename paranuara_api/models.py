@@ -88,14 +88,52 @@ class PersonQuerySet(models.QuerySet):
     def has_brown_eyes(self):
         return self.filter(eyecolor=Person.EYE_COLOR_BROWN)
 
+
     def has_friend(self, friend):
         return self.filter(friends=friend)
+
+    def friend_of(self, friend):
+        return self.filter(friend_of=friend)
 
 
 class PersonManager(models.Manager):
 
     def get_for_index(self, index):
         return self.get(index=index)
+
+    # TODO: Determine what 'friendship' actually means in this context!
+    # Is a friendship define just by the 'has friend' (forward) relationship, 
+    # or also by the 'friend of' (reverse) relationship.
+    #
+    # Consider:
+    #   Jack:
+    #       friends: Jill, Simon
+    #
+    #   Jill:
+    #       friends: Jack, Simon
+    #
+    #   Simon:
+    #       friends: (none)
+    #
+    #   Susan:
+    #       friends: Jack
+    #
+    # There are a range of reasonable answers to the question "who are Jack's
+    # friends":
+    #   1) Just the friends Jack lists: Jill & Simon
+    #   2) (1) plus the people who list Jack as a friend: Jill, Simon, & Susan
+    #   3) Only those who also consider Jack a friend: Jill (only)
+    #
+    # For the purposes of this exercise, we'll choose the easy option - 1!
+
+    def mutual_friends_alive_with_brown_eyes(self, person, friend):
+        # Select people who:
+        #   'person' considers a friend and
+        #   'friend' considers a friend and
+        #   are still alive and
+        #   have brown eyes
+        return (self.friend_of(person).friend_of(friend).
+                is_alive().has_brown_eyes())
 
 
 class Person(models.Model):
@@ -153,7 +191,8 @@ class Person(models.Model):
 
     tags = models.ManyToManyField(Tag, blank=True)
 
-    friends = models.ManyToManyField('Person', blank=True)
+    friends = models.ManyToManyField('Person', blank=True,
+                                     related_name='friend_of')
 
     greeting = models.CharField(max_length=100)
 
